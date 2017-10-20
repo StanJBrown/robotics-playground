@@ -5,7 +5,7 @@
 struct CostFunctor {
   template <typename T>
   bool operator() (const T* const x, T* residual) const {
-    residual[0] = T(10.0) - x[0];
+    residual[0] = T(10.0) - pow(x[0], 5);
     return true;
   }
 };
@@ -14,34 +14,29 @@ struct CostFunctor {
 
 int main(int argc, char** argv) {
 
-  google::initGoogleLogging(argv[0]);
+  // google::initGoogleLogging(argv[0]);
 
-  double init_x = -2;
+  double init_x = 10;
   double x = init_x;
 
   // Set up the ceres problem
-  Problem problem;
+  ceres::Problem problem;
 
   // Set up only the cost function (or residual) using auto-differentiation to find J
+  ceres::CostFunction* cost_function =
+    new ceres::AutoDiffCostFunction<CostFunctor, 1, 1>(new CostFunctor);
 
-  CostFunction* cost_function =
-    new AutoDiffCostFunction<CostFunctor, 1, 1>(new CostFunctor);
-
-  problem.AddResidualBlock(cost_function, NULL &x);
+  problem.AddResidualBlock(cost_function, NULL, &x);
 
   // start solving
-  Solver::Options options;
+  ceres::Solver::Options options;
   options.linear_solver_type = ceres::DENSE_QR;
   options.minimizer_progress_to_stdout = true;
-  Solver::Summary summary;
-  Solve(options, &problem, &summary);
+  ceres::Solver::Summary summary;
+  ceres::Solve(options, &problem, &summary);
 
   std::cout << summary.BriefReport() << "\n";
   std::cout << "x: " << init_x
     << " -> " << x << "\n";
   return 0;
-
 }
-
-
-

@@ -1,0 +1,26 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+PROJECT(ceres_test)
+
+#Packages
+FIND_PACKAGE(Ceres REQUIRED)
+FIND_PACKAGE(Eigen3 REQUIRED)
+
+#Include
+INCLUDE_DIRECTORIES(
+  include
+  ${CERES_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIRS}
+)
+
+
+# add excutable for test 1
+ADD_EXECUTABLE(
+  example_1
+  src/example_1.cpp
+)
+
+TARGET_LINK_LIBRARIES(
+  example_1
+  ${CERES_LIBRARIES}
+)
+
