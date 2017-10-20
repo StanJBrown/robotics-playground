@@ -1,61 +1,44 @@
 #include <opencv2/opencv.hpp>
 #include <Eigen/Dense>
 
-class Kernel {
-public:
-  Kernel(
-      Eigen::MatrixXd k) :
-      _k(k) {}
-
-  const Eigen::MatrixXd& operator * (Eigen::MatrixXd &mtx);
-  const Eigen::MatrixXd& constructKmtx();
-private:
-    Eigen::MatrixXd _k;
-};
-
-const Eigen::MatrixXd& Kernel::constructKmtx(int rows, int cols) {
-
-
-}
-
-const Eigen::MatrixXd& Kernel::operator * (Eigen::MatrixXd &mtx) {
-  int mtx_rows = mtx.rows();
-  int mtx_cols = mtx.cols();
-
-  int k_rows = _k.rows();
-  int k_cols = _k.cols();
-
-  // unroll the input matrix;
-
-  Eigen::MatrixXd temp(mtx_rows + 2 * k_rows, mtx_cols + 2 * k_cols);
-  temp.block(k_rows, k_cols, mtx_rows, mtx_cols) = mtx;
-
-  Eigen::Map<Eigen::MatrixXd> unrolled(
-      temp.data(),
-      (mtx_rows + 2*k_rows) * (mtx_cols + 2*k_cols),
-      1
-  );
-
-  Eigen::MatrixXd k_mtx =
-    constructKmtx(mtx_rows, mtx_cols);
-
-  // assume edges are zero
-}
-
+const std::string FOLDER("/home/stan/projects/robotics-playground/klt/test_imgs/");
+const std::string TEST_IMG_1 = FOLDER + std::string("sea_floor_1.jpg");
+const std::string TEST_IMG_2 = FOLDER + std::string("elephant.jpg");
+const std::string TEST_IMG_3 = FOLDER + std::string("piggy.png");
 
 int main () {
 
-  Eigen::MatrixXd kern(3, 3);
-  kern << 1, 1, 1,
-          1, 1, 1,
-          1, 1, 1;
+  cv::Mat img = cv::imread(TEST_IMG_1, 0);
+  cv::Mat filtered;
+  cv::Mat kernel;
 
-  Kernel test_kern(kern);
+  cv::Point anchor;
+  double delta;
+  int ddepth;
+  int kernel_size;
+  std::string window_name = "filter2d demo";
 
-  Eigen::MatrixXd test_mtx;
-  test_mtx = Eigen::MatrixXd::Identity(10, 10);
+  int c;
 
-  test_kern * test_mtx;
+  if (!img.data) {
+    return -1;
+  }
+
+  cv::namedWindow(window_name, CV_WINDOW_AUTOSIZE);
+
+  // set up filter
+  anchor = cv::Point(-1, -1);
+  delta = 0;
+  ddepth = -1;
+
+  double kernel_vals[2] = {0.0f, 1.0f};
+  kernel = cv::Mat(1, 2 , CV_32F, &kernel_vals);
+  kernel = cv::Mat(3, 1 , CV_32F, &kernel_vals);
+  cv::filter2D(img, filtered, ddepth, kernel); // , anchor, delta, cv::BORDER_DEFAULT);
+  // cv::Sobel(img, filtered, -1, 1, 0, 3, 1, 100);
+  cv::imshow(window_name, filtered);
+  cv::waitKey(0);
+
   return 0;
 }
 

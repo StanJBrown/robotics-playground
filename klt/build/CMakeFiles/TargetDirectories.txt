@@ -1,3 +1,0 @@
-/home/stan/projects/robotics-playground/klt/build/CMakeFiles/edit_cache.dir
-/home/stan/projects/robotics-playground/klt/build/CMakeFiles/rebuild_cache.dir
-/home/stan/projects/robotics-playground/klt/build/CMakeFiles/klt_test.dir
